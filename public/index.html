@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a14">
+<title>CMD Center · Multitech</title>
+<link rel="manifest" href="/manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a14;--bg2:#0f1023;--bg3:#161832;--bg4:#1c1f42;
+  --accent:#f97316;--accent2:#fb923c;--accent-glow:rgba(249,115,22,.15);
+  --green:#22c55e;--yellow:#eab308;--red:#ef4444;--cyan:#06b6d4;
+  --text:#eef0f6;--text2:#8b8fa8;--text3:#5a5e78;
+  --border:#1e2148;--border2:#282c58;
+  --radius:10px;
+}
+html{font-size:15px;-webkit-tap-highlight-color:transparent}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom,0)}
+.mono{font-family:'JetBrains Mono',monospace}
+header{position:sticky;top:0;z-index:90;background:linear-gradient(180deg,var(--bg) 70%,transparent);padding:16px 20px 24px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.h-row{display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:1.15rem;font-weight:800;letter-spacing:-.02em;color:var(--accent)}
+.logo span{color:var(--text3);font-weight:400;font-size:.75rem;margin-left:6px;letter-spacing:.06em;text-transform:uppercase}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px;animation:blink 2.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.sync-label{font-size:.7rem;color:var(--text3);letter-spacing:.04em}
+.sync-time{color:var(--text2);font-size:.65rem;margin-top:2px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 20px;margin-bottom:24px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden;transition:border-color .25s}
+.kpi:hover{border-color:var(--border2)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.ok::after{background:var(--green)}.kpi.warn::after{background:var(--yellow)}.kpi.err::after{background:var(--red)}
+.kpi-label{font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.kpi-val{font-size:1.6rem;font-weight:700;line-height:1}
+.kpi-val.green{color:var(--green)}.kpi-val.yellow{color:var(--yellow)}.kpi-val.red{color:var(--red)}.kpi-val.cyan{color:var(--cyan)}
+.kpi-badge{display:inline-block;margin-top:8px;font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:20px;background:rgba(34,197,94,.12);color:var(--green)}
+.kpi-badge.warn{background:rgba(234,179,8,.12);color:var(--yellow)}
+.kpi-badge.off{background:rgba(239,68,68,.12);color:var(--red)}
+.section{padding:0 20px;margin-bottom:28px}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.sec-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.sec-icon.ros{background:linear-gradient(135deg,var(--accent),#dc7b1a)}
+.sec-icon.web{background:linear-gradient(135deg,var(--cyan),#0891b2)}
+.sec-head h2{font-size:.95rem;font-weight:700;letter-spacing:-.01em}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;transition:border-color .2s}
+.card:hover{border-color:var(--border2)}
+.card-title{font-size:.72rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card.bug{border-left:3px solid var(--red)}
+.card.warn{border-left:3px solid var(--yellow)}
+.card.ok{border-left:3px solid var(--green)}
+.row{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:.8rem;color:var(--text2);line-height:1.45}
+.row:last-child{border-bottom:none}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.dot.g{background:var(--green)}.dot.y{background:var(--yellow)}.dot.r{background:var(--red)}
+.row strong{color:var(--text);font-weight:600}
+.progress{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--green));transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.log-item{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border);font-size:.78rem;color:var(--text2);gap:12px}
+.log-item:last-child{border-bottom:none}
+.log-msg{flex:1;line-height:1.4}
+.log-time{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--accent);white-space:nowrap;margin-top:2px}
+.cmd-bar{position:fixed;bottom:0;left:0;right:0;z-index:80;background:var(--bg);border-top:1px solid var(--border);padding:14px 16px calc(14px + env(safe-area-inset-bottom,0));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.cmd-input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:var(--radius);font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s}
+.cmd-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.cmd-input::placeholder{color:var(--text3)}
+.cmd-btns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.cmd-btn{padding:10px 0;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent}
+.cmd-btn:active{transform:scale(.95)}
+.cmd-btn.ros{background:linear-gradient(135deg,var(--accent),#e2680f);color:#fff}
+.cmd-btn.web{background:linear-gradient(135deg,var(--cyan),#0891b2);color:#fff}
+.cmd-btn.sync{background:var(--bg3);color:var(--green);border:1px solid var(--border)}
+.cmd-btn.wa{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
+.toast{position:fixed;top:80px;right:16px;left:16px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:var(--radius);padding:12px 16px;font-size:.78rem;color:var(--text);z-index:100;animation:slideDown .35s cubic-bezier(.4,0,.2,1);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast.error{border-left-color:var(--red)}
+@keyframes slideDown{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.bottom-spacer{height:140px}
+.skeleton{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;height:1rem;margin:4px 0}
+@keyframes shimmeb{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.tabs{display:flex;gap:0;padding:0 20px;margin-bottom:20px}
+.tab{flex:1;text-align:center;padding:10px 0;font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text3);border-bottom:2px solid transparent;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-content{display:none}.tab-content.active{display:block}
+@media(min-width:600px){
+  .grid{grid-template-columns:repeat(4,1fr)}
+  .cmd-bar{left:50%;transform:translateX(-50%);max-width:600px;border-radius:var(--radius) var(--radius) 0 0;border:1px solid var(--border)}
+  header,.section,.tabs{max-width:640px;margin-left:auto;margin-right:auto}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-row">
+    <div class="logo">CMD<span>center</span></div>
+    <div style="text-align:right">
+      <div><span class="sync-dot"></span><span class="sync-label">LIVE SYNC</span></div>
+      <div class="sync-time" id="syncTime">Syncing...</div>
+    </div>
+  </div>
+</header>
+<div class="grid" id="kpiGrid">
+  <div class="kpi ok"><div class="kpi-label">RentingOS</div><div class="kpi-val green" id="rosProgress">--</div><div class="kpi-badge" id="rosBadge">loading</div></div>
+  <div class="kpi ok"><div class="kpi-label">Website</div><div class="kpi-val cyan" id="webProgress">--</div><div class="kpi-badge" id="webBadge">loading</div></div>
+  <div class="kpi warn" id="bugCard"><div class="kpi-label">Bugs</div><div class="kpi-val yellow" id="bugCount">--</div><div class="kpi-badge warn" id="bugBadge">checking</div></div>
+  <div class="kpi ok"><div class="kpi-label">Instrucciones</div><div class="kpi-val" style="color:var(--text)" id="instrCount">--</div><div class="kpi-badge" id="instrBadge">--</div></div>
+</div>
+<div class="tabs">
+  <div class="tab active" data-tab="projects">Proyectos</div>
+  <div class="tab" data-tab="activity">Actividad</div>
+  <div class="tab" data-tab="instructions">Ordenes</div>
+</div>
+<div class="tab-content active" id="tab-projects">
+  <div class="section">
+    <div class="sec-head"><div class="sec-icon ros">📊</div><h2>RentingOS · Azure SaaS</h2></div>
+    <div class="card ok"><div class="card-title">✓ Modulos Activos</div><div id="rosModules"><div class="skeleton"></div><div class="skeleton" style="width:80%"></div></div><div class="progress"><div class="progress-fill" id="rosBar" style="width:0%"></div></div></div>
+    <div class="card warn"><div class="card-title">⏳ Pendientes</div><div id="rosPending"><div class="skeleton"></div><div class="skeleton" style="width:70%"></div></div></div>
+    <div class="card bug"><div class="card-title">🐛 Bugs Abiertos</div><div id="rosBugs"><div class="skeleton"></div></div></div>
+  </div>
+  <div class="section">
+    <div class="sec-head"><div class="sec-icon web">🌐</div><h2>Website · multi-tech.com.co</h2></div>
+    <div class="card ok"><div class="card-title">✓ Features</div><div id="webModules"><div class="skeleton"></div><div class="skeleton" style="width:85%"></div></div><div class="progress"><div class="progress-fill" id="webBar" style="width:0%"></div></div></div>
+    <div class="card warn"><div class="card-title">⏳ Mejoras en cola</div><div id="webPending"><div class="skeleton"></div></div></div>
+  </div>
+</div>
+<div class="tab-content" id="tab-activity">
+  <div class="section"><div class="card"><div class="card-title">📋 Ultimas acciones</div><div id="activityLog"><div class="skeleton"></div><div class="skeleton" style="width:90%"></div><div class="skeleton" style="width:75%"></div></div></div></div>
+</div>
+<div class="tab-content" id="tab-instructions">
+  <div class="section"><div class="card"><div class="card-title">📝 Instrucciones enviadas</div><div id="instrList"><div class="skeleton"></div><div class="skeleton" style="width:85%"></div></div></div></div>
+</div>
+<div class="bottom-spacer"></div>
+<div class="cmd-bar">
+  <input class="cmd-input" id="cmdInput" type="text" placeholder="Escribe instruccion..." enterkeyhint="send" autocomplete="off">
+  <div class="cmd-btns">
+    <button class="cmd-btn ros" onclick="send('rentingos')">RentingOS</button>
+    <button class="cmd-btn web" onclick="send('website')">Website</button>
+    <button class="cmd-btn sync" onclick="doSync()">⟳ Sync</button>
+    <button class="cmd-btn wa" onclick="openWA()">WA</button>
+  </div>
+</div>
+<script>
+const API='';
+let state=null;
+document.querySelectorAll('.tab').forEach(t=>{t.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById('tab-'+t.dataset.tab).classList.add('active')})});
+async function fetchStatus(){try{const r=await fetch(API+'/api/dashboard');if(!r.ok)throw new Error(r.status);state=await r.json();render(state);document.getElementById('syncTime').textContent='Sync: '+new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}catch(e){renderFallback()}}
+function render(d){const ros=d.projects[0],web=d.projects[1];document.getElementById('rosProgress').textContent=ros.progress+'%';document.getElementById('rosBadge').textContent=ros.status;document.getElementById('rosBadge').className='kpi-badge'+(ros.status==='online'?'':' warn');document.getElementById('webProgress').textContent=web.progress+'%';document.getElementById('webBadge').textContent=web.status;const totalBugs=d.summary.totalBugs;document.getElementById('bugCount').textContent=totalBugs;document.getElementById('bugBadge').textContent=totalBugs>0?'pending':'clear';document.getElementById('bugBadge').className='kpi-badge'+(totalBugs>0?' warn':'');document.getElementById('bugCard').className='kpi '+(totalBugs>0?'warn':'ok');const pending=d.summary.pendingInstructions;document.getElementById('instrCount').textContent=pending;document.getElementById('instrBadge').textContent=pending+' pending';document.getElementById('instrBadge').className='kpi-badge'+(pending>0?' warn':'');document.getElementById('rosModules').innerHTML=ros.modules.map(m=>'<div class="row"><span class="dot g"></span><span>'+m+'</span></div>').join('');document.getElementById('rosBar').style.width=ros.progress+'%';document.getElementById('rosPending').innerHTML=ros.pendingTasks.map(t=>'<div class="row"><span class="dot y"></span><span>'+t+'</span></div>').join('');document.getElementById('rosBugs').innerHTML=ros.bugs.length?ros.bugs.map(b=>'<div class="row"><span class="dot r"></span><span><strong>['+b.severity+']</strong> '+b.title+'</span></div>').join(''):'<div class="row" style="color:var(--green)">Sin bugs abiertos</div>';document.getElementById('webModules').innerHTML=web.modules.map(m=>'<div class="row"><span class="dot g"></span><span>'+m+'</span></div>').join('');document.getElementById('webBar').style.width=web.progress+'%';document.getElementById('webPending').innerHTML=web.pendingTasks.map(t=>'<div class="row"><span class="dot y"></span><span>'+t+'</span></div>').join('');const allInstr=[...(ros.instructions||[]),...(web.instructions||[])].sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));document.getElementById('instrList').innerHTML=allInstr.length?allInstr.slice(0,20).map(i=>{const dt=new Date(i.timestamp);return'<div class="log-item"><div class="log-msg"><strong>['+i.project+']</strong> '+i.text+' <span class="kpi-badge '+(i.status==='pending'?'warn':'')+'" style="font-size:.55rem">'+i.status+'</span></div><div class="log-time">'+dt.toLocaleDateString('es-CO',{day:'2-digit',month:'short'})+' '+dt.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})+'</div></div>'}).join(''):'<div class="row" style="color:var(--text3)">No hay instrucciones aun.</div>'}
+function renderFallback(){document.getElementById('rosProgress').textContent='65%';document.getElementById('rosBadge').textContent='offline';document.getElementById('rosBadge').className='kpi-badge off';document.getElementById('webProgress').textContent='98%';document.getElementById('webBadge').textContent='offline';document.getElementById('webBadge').className='kpi-badge off';document.getElementById('bugCount').textContent='?';document.getElementById('instrCount').textContent='?';document.getElementById('syncTime').textContent='API offline'}
+async function fetchActivity(){try{const r=await fetch(API+'/api/activity?limit=30');if(!r.ok)return;const d=await r.json();document.getElementById('activityLog').innerHTML=d.activities.length?d.activities.map(a=>{const dt=new Date(a.timestamp);return'<div class="log-item"><div class="log-msg">'+a.message+'</div><div class="log-time">'+dt.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})+'</div></div>'}).join(''):'<div class="row" style="color:var(--text3)">Sin actividad reciente</div>'}catch(e){document.getElementById('activityLog').innerHTML='<div class="row" style="color:var(--text3)">Conectando...</div>'}}
+async function send(project){const input=document.getElementById('cmdInput');const text=input.value.trim();if(!text){toast('Escribe una instruccion primero',true);return}try{const r=await fetch(API+'/api/instruction',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project,text,priority:'high'})});if(!r.ok)throw new Error(r.status);toast('['+project.toUpperCase()+'] Instruccion guardada');input.value='';fetchStatus();fetchActivity()}catch(e){toast('Error enviando',true)}}
+async function doSync(){toast('Sincronizando...');try{const r=await fetch(API+'/api/sync',{method:'POST'});if(!r.ok)throw new Error(r.status);toast('Sincronizacion completada');fetchStatus();fetchActivity()}catch(e){toast('Error en sync',true)}}
+function openWA(){const text=document.getElementById('cmdInput').value.trim()||'Estado del dashboard';window.open('https://wa.me/573007467691?text='+encodeURIComponent(text),'_blank')}
+function toast(msg,isError=false){const el=document.createElement('div');el.className='toast'+(isError?' error':'');el.textContent=msg;document.body.appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),300)},2800)}
+document.getElementById('cmdInput').addEventListener('keydown',e=>{if(e.key==='Enter')send('rentingos')});
+fetchStatus();fetchActivity();setInterval(fetchStatus,30000);setInterval(fetchActivity,60000);
+</script>
+</body>
+</html>
