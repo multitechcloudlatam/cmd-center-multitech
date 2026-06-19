@@ -46,8 +46,12 @@
 (diferencia de $31.6M vs real explicada 100%).
 
 **Pendientes técnicos Code2 (en repo de producto — NO accionables desde esta sesión):**
-- Split contable de los **683 activos** restantes (hojas con otros encabezados) + **validación de Carolina**
-  → ANTES de **encender auto-billing**.
+- 🔴 **CORRECCIÓN DE CAROLINA (Teams, 2026-06-12) — bloquea encender auto-billing.** Ver §8.
+  El 12-jun se cargó el split de **768 equipos** (costo/cloud/renting de RENTING-MAYO) y la corrida
+  de junio dio **45 facturas ~$84M c/IVA**. Carolina respondió que **está MAL**:
+  (a) el motor toma **437 contratos** pero **en renting solo están activos los ~67 clientes de su lista**
+  (whitelist en §8); (b) **junio NO son 45 facturas, son 96**. → Hay que **filtrar por su whitelist de
+  clientes activos** y **reconciliar hasta llegar a 96 facturas** antes de encender. (Trabajo en repo de producto.)
 - i18n EN frontend A1 (dashboard) + A2 (moneda por tenant en frontend, quitar COP hardcodeado).
 - Impuesto por país A3 (quitar IVA hardcodeado). Poblar más demo A4.
 - Módulo **CASOS legal** (correo→caso→doc→facturación; reutiliza Track 2 Graph).
@@ -109,6 +113,43 @@ copropiedades, maquinaria amarilla, flotas GPS, bufetes legales, asset mgmt). Nu
 
 ---
 
+## 8. Indicaciones de Carolina (Teams, 2026-06-12) — ACCIÓN PENDIENTE
+
+Chat 1:1 Jhovan ↔ **Carolina Carmona Arias** (analista operaciones / facturación).
+
+**Mensaje 1 (19:11):** *"¿De dónde está tomando datos de 437 contratos? En renting solo están activos
+los clientes que compartimos."* → adjunta la lista de clientes activos en renting (whitelist canónica).
+**Mensaje 2 (19:13):** *"45 facturas, no son 45 facturas. En el mes de junio fueron 96 facturas."*
+
+**Interpretación / acción (en repo de producto):**
+1. El motor de auto-billing está incluyendo **437 contratos** — demasiados. Debe **restringirse a la
+   whitelist de clientes activos** que dio Carolina (abajo). Contratos de clientes fuera de la lista
+   = NO facturar (probablemente demos/inactivos/duplicados).
+2. La corrida de junio debe **cuadrar en 96 facturas** (no 45). Tras aplicar la whitelist, reconciliar
+   el conteo y el monto contra la realidad de junio que maneja Carolina.
+
+**Whitelist de clientes activos en renting (Carolina, 2026-06-12) — ~67:**
+SIMPLE (Sist. Integrado Múltiple de Pagos) · FESATECH · OPTIMA INGENIERIA · COLEGIO JESUS MARIA ·
+NOVA SEGURIDAD PRIVADA · REGGIO EMILIA (Grupo Empr. Innovación Educativa) · FENIXPUNTONET · CREATIVE AGENCY ·
+FRUTY GREEN PACKING · FRESHCOLOMBIA INTERNATIONAL · INVERSIONES INNOVO · ELECTRICAS DE MEDELLIN ·
+AHORA (Servicios Temporales) · TRES TRIGOS · AZIMUT ENERGIA · GENESIS INVESTMENTS C.S.C · THE INSIDER VOX ·
+HINO MOTORS MANUFACTURING COLOMBIA · PROMOSUMMA · INTERASEO · AUTOFAX · OSSA CONSULTORIA · FRUTY GREEN SAS ·
+ATESA DE OCCIDENTE · VIVIR EN EL POBLADO · QUALITY RESULTS · CDA AJUSTEV · 24 H SERVICES · RBO DIGITAL ·
+DUE-LEGAL · KAIROS LOGISTICS · INTERASEO DEL ARCHIPIELAGO · G.I.R GESTION INTEGRAL DEL RIESGO ·
+EXTRUSIONES · RAIN COLOR · GOMEZ PAZOS & ASOCIADOS · METAWAY GROUP · OBRAZ ENTERPRISES ·
+ANTICIPACION Y CONTROL DE RIESGOS EMPRESARIALES · VERDE 2 GO · GALVACEROS · EMPRESA DE DESECHOS ESPECIALES (AEE) ·
+FRUTY GREEN EL SILENCIO · TECHNOLOGY SOLUTIONS FACTORY · ENERGY360 · OPERADORES DE SERVICIOS DE LA SIERRA ·
+ARENA SPORT CLUB · ALINA VELEZ COMUNICACIONES · PROSALCO · GRUPO CTL · SANTO FRIO · PROMOTORA DE COMERCIO SOCIAL ·
+MADERAS & PROYECTOS JCF · MAUTICA ENGLISH (Natalia Vélez) · DONAU SEGUROS · FACILCREDITOS · UNICO INTERIOR ·
+GRUPO 10Z · GLOBAL DYNAMICS GG · ALMEL DISTRIBUTOR GROUP · MANUFACTURA · IMPRESOS · GTD COLOMBIA · GT CONSULTING ·
+COMPAÑIA DE INVERSIONES Y LIBRANZAS · RECAUDOS DE VALORES.
+
+> ⚠️ No pude responderle en Teams desde la web (conector de solo lectura) ni aplicar el fix (repo de producto
+> fuera de scope). Pendiente: implementar el filtro por whitelist + reconciliar a 96 facturas en una sesión
+> con el repo del producto, y confirmarle a Carolina.
+
+---
+
 ## 7. Bitácora de sesiones web (git)
 
 ### 2026-06-14 — Sesión web "Code2" (este contenedor)
@@ -119,3 +160,11 @@ copropiedades, maquinaria amarilla, flotas GPS, bufetes legales, asset mgmt). Nu
 - **Hecho:** creado este `MEMORY.md` como espejo versionado de la memoria + push + PR draft.
 - ⚠️ Recordatorio para la sesión del PC: copiar novedades de este archivo de vuelta al SYNC-DIARIO de OneDrive
   (el conector web es de solo lectura).
+
+### 2026-06-14 (2) — App de escritorio caída; revisión de Teams (Carolina)
+- App de escritorio de Jhovan no responde → cambió de PC; pidió revisar respuestas de Carolina en Teams.
+- **Leí el hilo de Teams** (vía conector Graph, no el Chrome): Carolina respondió el **12-jun** con dos
+  correcciones al auto-billing (whitelist de ~67 clientes activos + junio = 96 facturas, no 45). Documentado en §8.
+- **No pude continuar la implementación**: el fix es en el repo del producto RentingOS (fuera de scope) y el
+  conector de Teams es de solo lectura (no pude responderle). Capturé sus indicaciones aquí para ejecutarlas
+  apenas haya repo de producto.
