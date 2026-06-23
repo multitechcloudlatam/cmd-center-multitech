@@ -150,6 +150,42 @@ COMPAÑIA DE INVERSIONES Y LIBRANZAS · RECAUDOS DE VALORES.
 
 ---
 
+## 9. Pista "Multitech International Business Route" (sesión 2026-06-13) — espejo
+
+> Fuente única en OneDrive: `_CLAUDE-SYNC/ENTREGABLES/2026-06-13_ESTADO-MAESTRO-Internacionalizacion-y-Marketing.md`.
+> Backup/migración al PC nuevo: carpetas `MIGRACION-CLAUDE-2026-06-15`, `MIGRACION-HISTORIAL-COMPLETO-2026-06-15`,
+> `MIGRACION-CLAUDE-CONFIG-2026-06-15` (config `.claude` + memoria completa). Migración COMPLETA.
+>
+> Reanudar la sesión local: `claude --continue` (o `--resume`) en la carpeta del proyecto; si arranca limpia,
+> adjuntar ese ESTADO-MAESTRO + recargar memorias permanentes: `stack_video_kling`, `tecnica_publicar_metricool`,
+> `tecnica_render_carruseles`, `cifras_honestas_materiales_internacionales`.
+
+**Hecho:** higiene cifras honestas (16+ archivos externos); 12 carruseles (5 EN-US + 7 ES, watermark);
+Kit redes RentingOS US (perfiles + 10 tweets + captions IG + posts LinkedIn EN); 4 posts SEO en blog
+(bilingual-invoices-florida-tax, jobber-vs-housecall, property-management-small-landlords, fleet-maintenance-mileage);
+prep sesión Microsoft Marketplace; video **"LA OBRA"** completo (15s 1080×1920 c/audio).
+
+**⏳ En vuelo / pendiente inmediato:**
+1. **Kling** "El viernes de Laura" (RentingOS inmobiliaria): clip 1 escrito en el editor, falta disparar Generate
+   (se desconectó la extensión); prompts clips 2-3 listos en el doc. Sigue M2 Multitech, D1 Dinámica, etc.
+2. **Publicar** LA OBRA (reel) + carrusel copropiedades en Metricool (@multitechcloud) vía clipboard+CDP.
+3. **Cuenta Google Ads US** (decisión Jhovan) → lanzar $50 (no mezclar con CO 466-731-6205; bono $350 vence 12-jul).
+4. **Re-deploy**: rentingos-us + homepage Multitech → GoDaddy cPanel; rentingos.com blog/coming-soon → Cloudflare Pages.
+5. **LinkedIn**: subir logo punteado `rentingos-logo-PUNTOS-300.png`.
+6. Reddit u/rentingos (+u/Multitech); Track 2 captura Graph/Outlook (dormido, flip cuando Carolina dé buzón);
+   botón servicio público en dinamicatecnologica.com.
+
+**Microsoft ISV:** sesión Marketplace **mié 17-jun 1pm**; specs en `RentingOS/Microsoft-ISV/`
+(`PREP-Marketplace-Publication-Session-2026-06-17.md`, `SPEC-CODE2-AppSource-SaaS-Transactable.md`).
+Quick-win: publicar AppSource como "Contact me" ya.
+
+**Técnicas dominadas (detalle en memorias):** Kling (editor contenteditable → teclear con CDP, no JS .value;
+descargar URL real output.mp4 del CDN vía performance.getEntriesByType + Invoke-WebRequest; no screenshots en kling.ai);
+Metricool (clipboard PowerShell STA + Ctrl+V CDP); render carruseles (headless Chrome HTML→PNG 1080×1350);
+clic confiable SPAs (computer left_click CDP isTrusted, no .click() JS); ⚠️ Chrome oculto congela SPAs → 2º monitor visible.
+
+---
+
 ## 7. Bitácora de sesiones web (git)
 
 ### 2026-06-14 — Sesión web "Code2" (este contenedor)
@@ -168,3 +204,11 @@ COMPAÑIA DE INVERSIONES Y LIBRANZAS · RECAUDOS DE VALORES.
 - **No pude continuar la implementación**: el fix es en el repo del producto RentingOS (fuera de scope) y el
   conector de Teams es de solo lectura (no pude responderle). Capturé sus indicaciones aquí para ejecutarlas
   apenas haya repo de producto.
+
+### 2026-06-14 (3) — Reanudar sesiones locales + verificar backup migración
+- App de escritorio caída y sesiones locales ("rentingOS Code2", "multitech international business route") pegadas.
+  Aclarado: no puedo revivir procesos locales desde la web; di pasos `claude --continue/--resume`.
+- **Backup VERIFICADO íntegro** en OneDrive: `claude-memory-backup/` (28 archivos) + `_CLAUDE-SYNC/` + master
+  `RentingOS-CONTEXTO-MAESTRO.md` (305KB) + 3 carpetas `MIGRACION-*-2026-06-15` (config .claude + memoria completa).
+  Nada perdido — 4 copias en 2 nubes (OneDrive + git).
+- **Espejé la pista internacional** en este archivo (§9) como copia extra versionada.
