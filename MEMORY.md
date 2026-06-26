@@ -8,8 +8,13 @@
 > **Regla de actualización:** cuando hagamos algo nuevo en una sesión web, se añade una entrada
 > fechada abajo y se commitea/pushea. Al volver al PC, copiar lo relevante al SYNC-DIARIO de OneDrive.
 >
-> **Última ingesta:** 2026-06-26 — leído SYNC-DIARIO + mapa de equipo de sesiones + handoffs deploy/Azure
-> de la sesión "rentingOS continuation" (ver §10). (Ingesta previa: 2026-06-14.)
+> **Última ingesta:** 2026-06-26 — leído SYNC-DIARIO + equipo de sesiones + handoffs deploy/Azure (§10)
+> + `rentingos-features-ground-truth.md` + `ARQUITECTURA-Y-DISASTER-RECOVERY-2026-06-26.md` (§11, §12).
+> (Ingesta previa: 2026-06-14.)
+>
+> 🥇 **PRINCIPIO OPERATIVO #1 (Jhovan, 2026-06-26): CUIDAR LOS DATOS + RESTABLECER LO MÁS RÁPIDO POSIBLE
+> ANTE CUALQUIER FALLA.** Por eso es VITAL el **monitoreo de toda la infraestructura y la app**. Antes de
+> cualquier cambio, no comprometer la integridad/disponibilidad de los datos. Detalle y estado en §12.
 
 ---
 
@@ -231,6 +236,67 @@ reactivar f049d131 (caso 2606240040005180) vs deploy fresco; (3) confirmar térm
 
 ---
 
+## 11. RentingOS PRODUCTO — estado REAL al 2026-06-26 (sesión Code2 / ground-truth)
+
+> Fuentes: `rentingos-features-ground-truth.md` + `RentingOS/ARQUITECTURA-Y-DISASTER-RECOVERY-2026-06-26.md`.
+> **SUPERSEDE el snapshot de §1 (era del 14-jun).** Repo de producto: **GitHub `multitechcloudlatam/rentingos@main`**
+> (acceso git DENEGADO 403 desde esta sesión web — ver bitácora). Doc fuente marcado CONFIDENCIAL (mapa de ataque):
+> aquí NO van credenciales/tokens/IPs; los valores viven en `C:\ClaudeBackups\rentingos-deploy\DEPLOY-SECRETS.txt`.
+
+**✅ LA APP YA ESTÁ ARRIBA de nuevo** — redeployada en la sub del crédito $5.000 (`9a941d16-…`, RG `rentingos-rg`):
+- Frontend: Static Web App `rentingos-frontend` (Free, eastus2) → **app.rentingos.com** (~48 páginas, PWA vanilla).
+- Backend: App Service `rentingos-api-prod` (B1 Linux Node22, centralus) → **api.rentingos.com** (`/health`); ~30 routers Express+Prisma.
+- BD: PostgreSQL Flexible `rentingosdb-prod` (B1ms v16, eastus2), **PITR 35 días + geo-redundante**.
+- DNS Cloudflare (zona rentingos.com). Costo ~US$40-60/mes (cubierto por crédito, vence 26-jun-2027).
+- **Microsoft Marketplace: LIVE** (oferta `rentingos-saas`).
+
+**Encendido y verificado (26-jun):**
+- **IA Claude REAL viva** (`claude-sonnet-4-6`, key "RentingOS Production 26jun26"); `/api/ai/status` → `configured:true`. **NO es demo** (la "demo sin LLM" era solo el `demo.html` de marketing).
+- **Stripe TEST completo** (cuenta Dynamic Tech LLC `acct_1TbXRBA…`) + webhook al backend. Switch a LIVE = copiar sk_live/pk_live tras QA de pagos. Brevo + Siigo activos.
+- **Datos cargados:** 2.432 clientes · 1.124 activos (RENTED, ligados a contratos) · 2.750 facturas · 206 contratos. **Canon real $153.999.381/mes**. Activos del Excel maestro `RENTING - MAYO 2026.xlsx` (65 clientes; script idempotente `load_assets.cjs`).
+
+**Features que SÍ existen en el repo (gated por keys, código listo):** IA Claude (cost-guard), QuickBooks 2-way (OAuth), Plaid ACH, Avalara tax (51 estados), Stripe Connect completo, CRM, firma electrónica con audit trail real (SHA-256 + IP + UA + timestamp + consent ESIGN/Ley 527), dashboard MRR + AR aging.
+- **Único gap real era PROYECTOS** → **YA CONSTRUIDO** en PR borrador #1 (`feat/projects-module`): backend `routes/projects.js` (projects/milestones/tasks/time_entries/project_assets, multi-tenant, CRUD + facturación + `/ai/plan`) + `proyectos.html`. SIN merge, SIN probar en vivo → lo termina/QA la sesión **"rentingOS continuation"**.
+
+**🔒 QA de seguridad en prod (5 agentes por rol) — APROBADO:** RBAC `/api/admin/*` → 403 a roles no-admin; aislamiento por tenant (401 sin token, 404 a ajenos); **portal cliente NO filtra campos internos** (costo/proveedor/propietario/márgenes/internalCode ocultos); IDOR y escalada bloqueados. 8 roles, JWT 12h+refresh.
+
+**🐛 Roadmap de bugs (estado vivo del doc):**
+- [P0] split (aee/cloud/aed_monthly) → `billing-preview`/`split-pending` 500 → **✅ HECHO (BD)**.
+- [P1] Dashboard MRR ($8M falso vs $154M real; canon vive en `assets.monthlyCanon`) → **✅ HECHO ($162M desde activos)**.
+- [P2] token de cliente en endpoint interno → 403 (no 500) → ✅ código listo, **redeploy en curso**.
+- [P1] **i18n EN/ES** cableado (hoy español hardcodeado; 2 sistemas paralelos a unificar) → 🔄 en curso (bloquea US).
+- [P1] **Emitir lote de 2.750 facturas DRAFT** (dueDate null → aging $0) → ⏸️ espera **decisión fiscal de Carolina** (la herramienta ya funciona) — liga con §8.
+- Drift: `ai.js` de prod permite SUPERVISOR pero el backup no → re-sincronizar repo/backup. Seed: ligar activos↔contratos.
+
+**Regla de claims (Marketplace + sitio):** reafirmar IA/QuickBooks/ACH/tax como activos SOLO tras (1) app viva, (2) QA en vivo, (3) keys productivas + KYC. Keys productivas pendientes: Stripe LIVE, QuickBooks (Intuit), Plaid prod, Avalara, Wompi.
+
+---
+
+## 12. 🥇 Monitoreo + Protección de datos + Disaster Recovery (PRIORIDAD #1)
+
+> Doc maestro: `automatizacion/renting/RUNBOOK-MONITOREO-Y-DR-RENTINGOS.md` + `ARQUITECTURA-Y-DISASTER-RECOVERY-2026-06-26.md`.
+> **Objetivos:** RPO ≈ 5–10 min (PITR continuo) · RTO ≈ 15–40 min según escenario.
+
+**Red de seguridad ACTIVA:**
+- **Monitor cada 5 min** (`monitor-rentingos.ps1`, tarea Windows `RentingOS-Monitor`) con **auto-remediación**:
+  /health ≠ 200 → `az webapp restart`; Postgres state ≠ Ready → `az postgres flexible-server start`. Logs en `C:\ClaudeBackups\rentingos-monitor\`.
+- **Backup Azure:** PITR **35 días** + **geo-redundante** (activo desde creación).
+- DR por escenario: datos corruptos → `az postgres flexible-server restore --restore-time` (servidor nuevo, no sobreescribe); región caída → `geo-restore`; pérdida total → reconstrucción §9.2 de `PROJECT-STATE-RECONSTRUCTION`.
+
+**⚠️ BRECHAS DE MONITOREO/DR (cerrar — alineado con Principio #1):**
+1. 🔴 **Respaldo lógico off-Azure NO está activo:** `pg_dump` semanal cifrado (runbook `RUNBOOK-BACKUP-DB-AUTOMATICO.md`).
+   **OBLIGATORIO** — lección jun-2026: la sub vieja `f049d131` quedó deshabilitada y su BD inaccesible; no depender de un solo proveedor.
+2. 🔴 **El monitor corre en el PC de Jhovan** (tarea Windows) → si el PC está apagado/dormido, **no hay monitoreo**.
+   **Recomendación (mía):** mover a monitoreo **nativo en la nube** — Application Insights + *availability test* sobre `/health`
+   + alertas de Azure Monitor (correo/SMS) → independiente del PC, cumple "monitoreo de toda la infra y app" 24/7.
+3. 🟡 Apagar el toggle de acceso elevado de Global Admin en Entra; rotar la Anthropic key vieja `rentingos-prod`.
+
+**Comandos clave (referencia):** `curl https://api.rentingos.com/health` · `az webapp log tail -g rentingos-rg -n rentingos-api-prod`
+· redeploy backend `az webapp deploy … --type zip` · frontend `swa deploy … --deployment-token`.
+Secrets: Azure App Settings (fuente de verdad) + respaldo local `DEPLOY-SECRETS.txt` (NUNCA en repo).
+
+---
+
 ## 7. Bitácora de sesiones web (git)
 
 ### 2026-06-14 — Sesión web "Code2" (este contenedor)
@@ -266,3 +332,15 @@ reactivar f049d131 (caso 2606240040005180) vs deploy fresco; (3) confirmar térm
   sub 9a941d16, dato encerrado en f049d131, procedimiento de deploy, y que el **código de producto está en
   GitHub `multitechcloudlatam/rentingos`** (desbloquea el fix de Carolina §8 si se agrega a una sesión).
 - Marketplace ya LIVE. Pendientes Azure = clics de Jhovan (RBAC, decisión de datos, términos del crédito).
+
+### 2026-06-26 (2) — Ingesta profunda Code2 + producto vivo + prioridad monitoreo/DR
+- Pedido Jhovan: agregar repo de producto, no perder nada, continuar; **prioridad = cuidar datos + recuperación
+  rápida + monitoreo de toda la infra/app**; "leer y actualizar cada línea de la sesión rentingOS Code2".
+- **Repo `multitechcloudlatam/rentingos`: acceso git DENEGADO (403)** desde esta sesión (scope = cmd-center-multitech).
+  Para ejecutar el fix de Carolina (§8) / merge del PR #1 de Proyectos / deploys → abrir una sesión scopeada a ese repo.
+- **Leí y espejé el estado REAL del producto** (`features-ground-truth` + doc Arquitectura/DR): la app **ya está
+  arriba** en la sub nueva (app/api.rentingos.com), IA Claude + Stripe TEST verificados, 1.124 activos / $154M canon,
+  QA de seguridad APROBADO, bugs P0/P1 mayormente resueltos, módulo Proyectos en PR #1. Todo en §11.
+- **Monitoreo/DR → §12** como Principio #1, con las 2 brechas críticas (pg_dump off-Azure inactivo; monitor depende
+  del PC) y mi recomendación de monitoreo nativo Azure (App Insights + availability test + alertas) 24/7.
+- ⚠️ El doc fuente es CONFIDENCIAL (mapa de ataque): NO copié credenciales/tokens/IPs al repo, solo arquitectura/estado.
