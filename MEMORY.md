@@ -8,7 +8,8 @@
 > **Regla de actualización:** cuando hagamos algo nuevo en una sesión web, se añade una entrada
 > fechada abajo y se commitea/pushea. Al volver al PC, copiar lo relevante al SYNC-DIARIO de OneDrive.
 >
-> **Última ingesta:** 2026-06-14 — leído `SYNC-DIARIO.md` (mod. 2026-06-14 02:50).
+> **Última ingesta:** 2026-06-26 — leído SYNC-DIARIO + mapa de equipo de sesiones + handoffs deploy/Azure
+> de la sesión "rentingOS continuation" (ver §10). (Ingesta previa: 2026-06-14.)
 
 ---
 
@@ -186,6 +187,50 @@ clic confiable SPAs (computer left_click CDP isTrusted, no .click() JS); ⚠️ 
 
 ---
 
+## 10. Equipo de sesiones + sesión "rentingOS continuation" (deploy/infra/Azure) — 2026-06-25/26
+
+**Modelo de equipo (decidido 25-jun):** Jhovan trabaja con VARIAS sesiones de Claude Code en paralelo, por carril.
+Coordinan por **archivos HANDOFF-*.md** (mismo cwd `Documentos`) + **memoria** (no por mensaje directo;
+`send_message` entre sesiones está bloqueado en modo no supervisado). Memoria fuente: `equipo-sesiones-claude.md`.
+- **"Estrategia/Marketing"** (id a0ed7061): marca, redes, Ads, contenido/videos, Marketplace (listing/diagnóstico).
+- **"rentingOS continuation"** (id `local_a11545ad-…`): **deploy/infra/Azure**.
+- Otras: "Publicador autónomo redes", "Followup ANDI leads t2", "Dinámica website redesign".
+
+**Qué hace / estado de "rentingOS continuation" (carril deploy/infra/Azure):**
+- 🔴 **RentingOS está CAÍDO (403).** La sub Azure `f049d131` se deshabilitó al agotarse el crédito de $100.
+- 💰 **Nuevo crédito USD $5.000 Azure**, válido **hasta 26-jun-2027** (cuenta jdlopera@). Uso acordado:
+  **infra/producto, NO ads** → mantener RentingOS vivo + rápido + IA real (Azure OpenAI) + ambientes demo
+  para prospectos del Marketplace (ya LIVE) y de los Ads. Incidente/caso soporte: `rentingos-azure-access.md`.
+- ⛔ **Bloqueo de acceso (26-jun):** ni `cloud@` ni `jdlopera@` tienen rol RBAC sobre "Suscripción de Azure 1"
+  (`9a941d16-…`) → no se puede desplegar hasta que **Jhovan asigne Owner** (Claude no asigna roles).
+  Pasos: Entra → Identidad → Propiedades → "Administración de acceso para recursos Azure: Sí" → IAM de la sub
+  → Agregar asignación de rol Owner a jdlopera@ y cloud@ → (revertir toggle).
+- 🗄️ **Dato crítico:** la BD de producción está encerrada en la sub deshabilitada f049d131. Camino A (preferido):
+  reactivar f049d131 (caso Azure **2606240040005180**) → `pg_dump` → restaurar (cero pérdida). Camino B: deploy
+  fresco + cargar `RENTING - MAYO 2026.xlsx` (inventario maestro de Carolina, respaldado) — se pierde historial.
+- 🚀 **Procedimiento de deploy** (`RentingOS/PROJECT-STATE-RECONSTRUCTION-2026-06-25.md`): nuevo `rentingos-rg`
+  en sub 9a941d16 · Azure Postgres Flexible + restaurar dump + **PITR día 1** · App Service Node 22 desde GitHub
+  **`multitechcloudlatam/rentingos`** (`backend_deploy/src/index.js`) · Static Web App (frontend) · env vars
+  (DATABASE_URL, JWT_SECRET, BREVO/SIIGO/STRIPE/QBO/PLAID/AVALARA) · DNS app/api.rentingos.com · activar
+  `backup-db-rentingos.ps1` (Task Scheduler, `RUNBOOK-BACKUP-DB-AUTOMATICO.md`).
+- 📄 También en su cola: **deploy de 3 páginas legales** en www.rentingos.com + **reenvío/confirmación del Marketplace**.
+
+**Otros handoffs vivos del 25-26 jun (en `Documentos/RentingOS/`):**
+`HANDOFF-MARKETPLACE-DEPLOY-2026-06-25.md`, `HANDOFF-MARKETPLACE-CONFIRMAR-2026-06-25.md`,
+`HANDOFF-rentingOS-continuation-SIIGO-RECONCILIACION-2026-06-26.md` (reconciliación Siigo — liga con §8 Carolina),
+`HANDOFF-AZURE-CREDITO-5000-2026-06-26.md`, `HANDOFF-DEPLOY-SUB-5000-2026-06-26.md`,
+`HANDOFF-MARKETING-LANZAMIENTO-MARKETPLACE-2026-06-26.md`. Estado real de features:
+`rentingos-features-ground-truth.md` (06-26, corrige auditoría parcial del 25-jun). Marketplace ya **LIVE**;
+plan de amplificación: `ENTREGABLES/LANZAMIENTO-MARKETPLACE-2026-06-26/PLAN-AMPLIFICACION.md`.
+
+> 🔓 **El código de producto SÍ está en GitHub:** `multitechcloudlatam/rentingos`. Si se agrega a una sesión,
+> desde ahí se puede ejecutar el fix de auto-billing de Carolina (§8) y los deploys, sin depender del PC.
+
+**Pendientes que solo destraba Jhovan (carril Azure):** (1) asignar RBAC Owner en sub 9a941d16; (2) decidir
+reactivar f049d131 (caso 2606240040005180) vs deploy fresco; (3) confirmar términos del crédito $5.000.
+
+---
+
 ## 7. Bitácora de sesiones web (git)
 
 ### 2026-06-14 — Sesión web "Code2" (este contenedor)
@@ -212,3 +257,12 @@ clic confiable SPAs (computer left_click CDP isTrusted, no .click() JS); ⚠️ 
   `RentingOS-CONTEXTO-MAESTRO.md` (305KB) + 3 carpetas `MIGRACION-*-2026-06-15` (config .claude + memoria completa).
   Nada perdido — 4 copias en 2 nubes (OneDrive + git).
 - **Espejé la pista internacional** en este archivo (§9) como copia extra versionada.
+
+### 2026-06-26 — Ingesta de la sesión "rentingOS continuation" (deploy/infra/Azure)
+- Esta sesión web "revivió" con un mensaje del usuario tras quedar inactiva post-migración (igual les pasó a
+  las sesiones nuevas que creó). Pedido: actualizarme y espejar lo de "rentingOS continuation".
+- Leí: `equipo-sesiones-claude.md` (modelo de equipo de sesiones) + handoffs Azure/deploy del 25-26 jun.
+- **Espejé todo en §10:** RentingOS caído (403), crédito Azure $5.000 (hasta 26-jun-2027), bloqueo RBAC en
+  sub 9a941d16, dato encerrado en f049d131, procedimiento de deploy, y que el **código de producto está en
+  GitHub `multitechcloudlatam/rentingos`** (desbloquea el fix de Carolina §8 si se agrega a una sesión).
+- Marketplace ya LIVE. Pendientes Azure = clics de Jhovan (RBAC, decisión de datos, términos del crédito).
