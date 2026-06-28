@@ -8,6 +8,8 @@
 - `reconcile-siigo.mjs` — **Ítem 3**: script READ-ONLY que cruza el Excel maestro de canon vs facturas Siigo por NIT/OC
   y emite reporte de diferencias. No escribe nada, no dispara facturación.
 - `AZURE-APPSETTINGS-Y-QA-PLAN.md` — **Ítem 2**: lista exacta de App Settings a setear + plan de QA en vivo (P0-1).
+- `main.bicep` — Infra-as-Code del stack (App Service Node22 + Postgres Flexible PITR35/geo + Static Web App +
+  App Insights + Key Vault + alertas). Validar con `az bicep build` / `what-if`. Base para reconstrucción/DR.
 
 ## Estado de los 3 ítems del handoff
 | Ítem | Qué | Estado desde esta sesión |

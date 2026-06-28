@@ -459,3 +459,10 @@ reconcile-siigo.mjs · AZURE-APPSETTINGS-Y-QA-PLAN.md · README. Mover a `multit
   (READ-ONLY, `node --check` OK), `AZURE-APPSETTINGS-Y-QA-PLAN.md`, README. Listos para mover a `multitechcloudlatam/rentingos`.
 - **Regla de seguridad registrada:** motor de facturación en MODO PRUEBA; no encender hasta reconciliar Siigo; Carolina incapacitada; Ley 1116.
 - Ítem 1 (Proyectos) ya está en PR #1 → falta QA/merge en el repo. Ítem 2 keys/Azure = KYC de Jhovan. Ítem 3 script listo, corre con DB+SIIGO_ACCESS_KEY.
+
+### 2026-06-27 (2) — Acceso al repo de producto: DENEGADO definitivo + main.bicep
+- Probado por API de GitHub (`list_branches multitechcloudlatam/rentingos`) → **"Access denied: not configured for this session.
+  Allowed: multitechcloudlatam/cmd-center-multitech"**. También `git` da 403. Esta sesión NO puede tocar el repo de producto
+  por ningún canal (ni el Chrome del PC, que no controlo desde aquí). **Para desarrollar rentingos → abrir sesión scopeada a ese repo.**
+- Agregado `code2-staging/main.bicep` (Infra-as-Code: App Service Node22 + Postgres Flexible PITR35/geo + Static Web App +
+  App Insights + Key Vault + action group/alertas). Validar con `az bicep build`/`what-if` en el repo de producto.
