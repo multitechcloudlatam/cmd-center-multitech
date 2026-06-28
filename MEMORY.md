@@ -22,6 +22,39 @@
 
 ---
 
+## ⚡ §0-TL;DR — Resumen de temas + Pendientes accionables (LEER PRIMERO)
+
+> Actualizado 2026-06-26. Esta es la **memoria única** del proyecto entre sesiones de Claude. Índice de secciones:
+> §0 identidad · §1 RentingOS (snapshot viejo, ver §11) · §2 cifras honestas · §3 Microsoft/Azure · §4 marketing ·
+> §5 acciones manuales · §6 reglas · §8 facturación/Carolina · §9 pista internacional · §10 equipo de sesiones ·
+> §11 producto REAL 26-jun · §12 monitoreo/DR (prioridad #1) · §7 bitácora.
+
+**Temas vivos:** (1) RentingOS producto en Azure (app viva en sub $5.000); (2) facturación junio / reglas de Carolina;
+(3) monitoreo + respaldo + DR (prioridad #1 de Jhovan); (4) Marketplace Microsoft (LIVE); (5) marketing 3 marcas;
+(6) continuidad de memoria entre sesiones.
+
+**🔴 Pendientes accionables (orden sugerido):**
+1. **Acceso real para ejecutar:** abrir sesión con el repo `multitechcloudlatam/rentingos` y/o `az login` como
+   **`cloud@dinamicatecnologica.com`** (jdlopera@ no tiene RBAC). Desde la web actual el repo da 403.
+2. **Respaldo OBLIGATORIO off-Azure** (brecha crítica): activar `pg_dump` semanal cifrado fuera de Azure. Plan+script:
+   `runbooks/BACKUP-Y-DR-INTEGRAL.md`. (Lección jun: la sub vieja se deshabilitó con la BD adentro.)
+3. **Monitoreo 24/7 independiente del PC:** mover el monitor (hoy tarea de Windows en el PC) a Azure nativo
+   (Application Insights + availability test sobre `/health` + alertas). Mismo runbook.
+4. **Re-verificar en la sub nueva** lo que se hizo el 19-jun en la vieja (Fruty Green→33, cierre de 410 contratos,
+   conteo 96 facturas). Checklist: `runbooks/CHECKLIST-REVERIFICACION-SUB-NUEVA.md`.
+5. **Facturación junio (corte día 27):** decisión canon = **Opción A** (confirmada) → ajustar `billing_split.js`;
+   construir modelo **OC + prefactura** (Interaseo/Eléctricas); pedir a Carolina export Siigo de pagadas + Costo/CLOUD
+   faltantes; luego **encender auto-billing**.
+6. **Bugs producto (§11):** i18n EN/ES (bloquea US), emitir lote 2.750 facturas DRAFT (decisión fiscal Carolina),
+   re-sync drift `ai.js`. Terminar/mergear PR #1 módulo **Proyectos**.
+7. **Marketing:** Chrome visible → programar carruseles; logo LinkedIn; créditos Kling; cuenta Google Ads US (bono vence 12-jul).
+
+**🔁 CONTINUIDAD (cómo no perder el hilo nunca):** esta `MEMORY.md` es el cerebro persistente. El mecanismo está en
+`runbooks/CONTINUIDAD-claude.md` (hook SessionStart que la auto-carga + frase de arranque). Al cerrar cualquier sesión:
+actualizar esta memoria y commitear. Al abrir una nueva (o tras compactar): se relee y se retoma sin perder nada.
+
+---
+
 ## 0. Identidad y alcance de esta sesión
 
 - **Sesión:** "RentingOS Code2" (rama `claude/rentingos-code2-w59hcd`).
@@ -383,3 +416,10 @@ Secrets: Azure App Settings (fuente de verdad) + respaldo local `DEPLOY-SECRETS.
 - Registrada la identidad Azure correcta (**cloud@**, jdlopera@ sin RBAC) y respuesta enviada a Carolina por Chrome (19-jun).
 - Pendientes vivos de facturación: export Siigo pagadas, split_pendiente_carolina.csv, modelo OC + prefactura,
   duplicados DUP-, Andrey, DataCrédito → encender auto-billing **antes del corte día 27**.
+
+### 2026-06-26 (4) — Memoria única + continuidad + plan de respaldo/DR
+- Consolidé esta `MEMORY.md` como **memoria única** y agregué **§0-TL;DR** (resumen de temas + pendientes accionables + cómo retomar).
+- **Continuidad:** `runbooks/CONTINUIDAD-claude.md` (hook SessionStart que auto-carga MEMORY.md + frase de arranque + disciplina de cierre).
+  ⚠️ El clasificador de seguridad bloqueó que YO creara el hook auto-ejecutable + `.claude/settings.json`; quedan listos para que Jhovan los apruebe (1 vez).
+- **Respaldo integral:** `runbooks/BACKUP-Y-DR-INTEGRAL.md` — código (mirror+bundle), infra (ARM/Bicep export), claves (Key Vault + copia cifrada), BD (PITR ✅ + `pg_dump` off-Azure cifrado ❌ pendiente), monitoreo Azure 24/7. No ejecutable desde la web (sin acceso Azure/BD); listo para correr con `cloud@`.
+- **Re-verificación:** `runbooks/CHECKLIST-REVERIFICACION-SUB-NUEVA.md` (confirmar en la sub $5.000 lo hecho el 19-jun en la vieja).
