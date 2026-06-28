@@ -9,8 +9,12 @@
 > fechada abajo y se commitea/pushea. Al volver al PC, copiar lo relevante al SYNC-DIARIO de OneDrive.
 >
 > **Última ingesta:** 2026-06-26 — leído SYNC-DIARIO + equipo de sesiones + handoffs deploy/Azure (§10)
-> + `rentingos-features-ground-truth.md` + `ARQUITECTURA-Y-DISASTER-RECOVERY-2026-06-26.md` (§11, §12).
-> (Ingesta previa: 2026-06-14.)
+> + `rentingos-features-ground-truth.md` + `ARQUITECTURA-Y-DISASTER-RECOVERY-2026-06-26.md` (§11, §12)
+> + `PENDIENTES-AL-CAMBIO-DE-PC-2026-06-18.md` (transcript sesión continuation → §8 ampliado). (Ingesta previa: 2026-06-14.)
+>
+> **Azure:** la identidad con RBAC sobre `rentingos-rg` es **`cloud@dinamicatecnologica.com`** (Owner);
+> `jdlopera@` NO tiene roles ahí (entra a Azure pero ve 0 recursos). Para `az` usar cloud@ (device-code si Windows
+> cachea jdlopera@). DB directa bloqueada por firewall salvo IP autorizada; backend API público y sano (`/health` ok).
 >
 > 🥇 **PRINCIPIO OPERATIVO #1 (Jhovan, 2026-06-26): CUIDAR LOS DATOS + RESTABLECER LO MÁS RÁPIDO POSIBLE
 > ANTE CUALQUIER FALLA.** Por eso es VITAL el **monitoreo de toda la infraestructura y la app**. Antes de
@@ -119,20 +123,45 @@ copropiedades, maquinaria amarilla, flotas GPS, bufetes legales, asset mgmt). Nu
 
 ---
 
-## 8. Indicaciones de Carolina (Teams, 2026-06-12) — ACCIÓN PENDIENTE
+## 8. Facturación / Carolina — indicaciones del 12-jun + ejecución (sesión continuation)
 
-Chat 1:1 Jhovan ↔ **Carolina Carmona Arias** (analista operaciones / facturación).
+> Fuente ampliada: `automatizacion/renting/PENDIENTES-AL-CAMBIO-DE-PC-2026-06-18.md` (act. 19-jun) +
+> `REGLAS-FACTURACION-CAROLINA-2026-06-09.md`. Chat 1:1 Jhovan ↔ **Carolina Carmona Arias** (ops/facturación).
 
-**Mensaje 1 (19:11):** *"¿De dónde está tomando datos de 437 contratos? En renting solo están activos
-los clientes que compartimos."* → adjunta la lista de clientes activos en renting (whitelist canónica).
-**Mensaje 2 (19:13):** *"45 facturas, no son 45 facturas. En el mes de junio fueron 96 facturas."*
+**🟢 Ya hecho/desplegado (no rehacer):** split recalibrado (commit `77c46df`):
+**`CANON = AEE(Costo/60) + CLOUD(columna Excel) + AED`; IVA 19% SOLO sobre AED** (el Cloud va DENTRO del canon).
+768 equipos cargados con split a `assets.aee_monthly/cloud_monthly/aed_monthly` (backup reversible). Pantalla
+"Facturación automática" (3 pasos) desplegada. GRUPO CTL resuelto.
 
-**Interpretación / acción (en repo de producto):**
-1. El motor de auto-billing está incluyendo **437 contratos** — demasiados. Debe **restringirse a la
-   whitelist de clientes activos** que dio Carolina (abajo). Contratos de clientes fuera de la lista
-   = NO facturar (probablemente demos/inactivos/duplicados).
-2. La corrida de junio debe **cuadrar en 96 facturas** (no 45). Tras aplicar la whitelist, reconciliar
-   el conteo y el monto contra la realidad de junio que maneja Carolina.
+**✅ Carolina respondió el 12-jun (tarde, hora CO) — 3 indicaciones** (la búsqueda por palabras NO las captaba;
+hay que leer el hilo directo):
+1. **Los "437 contratos" no son reales** → padrón AUTORITATIVO de ~66/67 clientes activos (whitelist abajo).
+   Inactivar todo lo que no esté en él (artefactos de la importación Siigo).
+2. **Junio = 96 facturas, no 45** (FV-501-14679→14796 + NC-2-1277, reporte Siigo "Ventas por centro de costo
+   RENTING", 19-jun). El motor sub-contaba por falta de split por **OC** (Interaseo 3 OC, Eléctricas ≈16) + multi-contrato.
+3. **FRUTY GREEN PACKING: 45 equipos → deben ser 33** (retiros del mes; adjuntó `FRUTY GREEN PACKING.xlsx`).
+
+**✅ Ejecutado el 19-jun (sesión continuation, sobre la sub vieja f049d131):**
+- **Tarea 1 — Fruty Green 45→33:** el "45" era el **Portal del Cliente**; `GET /api/portal/me/assets`
+  (`portal.js:497`) listaba todos los equipos sin filtrar → fix: `status:'RENTED'` (33). Desplegado vía Kudu VFS
+  + recycle. Backup `C:\ClaudeBackups\snapshots\portal.js.original-20260619-152914`. Sin tocar plata.
+- **Tarea 2 — limpieza de contratos artefacto:** cerrados **410 contratos** ACTIVE→TERMINATED (valor $0 / 0 equipos /
+  fuera de padrón). **Activos 601 → 191.** Reversible (`...\task2-pre-20260619-103343\`). NO tocados: 73 del padrón
+  sin equipos linkeados, 48 con valor>0, 23 demo USA.
+
+**🔴 DECISIÓN JHOVAN: Canon = OPCIÓN A** (confirmada) → canon = suma del Excel por equipo (AEE+CLOUD+AED),
+reconcilia automático con los 768 splits; ajustar `billing_split.js` + re-deploy. (B = canon del contrato, descartada.)
+**Autorizado:** usar login admin del API de RentingOS para los cambios de Carolina (con confirmación antes de destructivo).
+
+**⏱️ Corte de facturación: día 27** (junio anticipado). Encender auto-billing requiere: decisión de canon (✅ A) +
+datos de Carolina ANTES del 27.
+
+**🟡 Pendiente de Carolina:** export Siigo de facturas REALMENTE pagadas (limpiar aging inflado ~$2.000M antes del
+dunning); Costo/CLOUD de los equipos en `split_pendiente_carolina.csv` que no casaron.
+**🟠 Por construir:** modelo **OC** (facturar por orden de compra; OC vencida → NO facturar) + flujo **prefactura**
+(Interaseo/Eléctricas: prefactura por correo → 1-2 días para revisar OC → recién a DIAN).
+**🔵 Operativos:** nombre real de Andrey (Frutygreen); barrido duplicados por NIT (patrón `DUP-`); botón "servicio
+público" en dinamicatecnologica.com; DataCrédito/Experian + encender facturación.
 
 **Whitelist de clientes activos en renting (Carolina, 2026-06-12) — ~67:**
 SIMPLE (Sist. Integrado Múltiple de Pagos) · FESATECH · OPTIMA INGENIERIA · COLEGIO JESUS MARIA ·
@@ -150,9 +179,9 @@ MADERAS & PROYECTOS JCF · MAUTICA ENGLISH (Natalia Vélez) · DONAU SEGUROS · 
 GRUPO 10Z · GLOBAL DYNAMICS GG · ALMEL DISTRIBUTOR GROUP · MANUFACTURA · IMPRESOS · GTD COLOMBIA · GT CONSULTING ·
 COMPAÑIA DE INVERSIONES Y LIBRANZAS · RECAUDOS DE VALORES.
 
-> ⚠️ No pude responderle en Teams desde la web (conector de solo lectura) ni aplicar el fix (repo de producto
-> fuera de scope). Pendiente: implementar el filtro por whitelist + reconciliar a 96 facturas en una sesión
-> con el repo del producto, y confirmarle a Carolina.
+> ✅ **Respondido a Carolina** (la sesión continuation LOCAL escribió por la pestaña de Teams en Chrome, 19-jun
+> 21:01: Fruty Green→33, padrón oficial, cuadrar 96 facturas). El conector de Teams de esta sesión web es de
+> **solo lectura** (no envía) — para escribirle se usa el Chrome del PC. Carolina sin respuesta nueva desde el 12-jun.
 
 ---
 
@@ -344,3 +373,13 @@ Secrets: Azure App Settings (fuente de verdad) + respaldo local `DEPLOY-SECRETS.
 - **Monitoreo/DR → §12** como Principio #1, con las 2 brechas críticas (pg_dump off-Azure inactivo; monitor depende
   del PC) y mi recomendación de monitoreo nativo Azure (App Insights + availability test + alertas) 24/7.
 - ⚠️ El doc fuente es CONFIDENCIAL (mapa de ataque): NO copié credenciales/tokens/IPs al repo, solo arquitectura/estado.
+
+### 2026-06-26 (3) — Ingesta del historial de la sesión "rentingOS continuation" (billing 18-19 jun)
+- Jhovan pegó el historial de continuation y pidió revisar los MD/rutas que menciona y actualizarme.
+- Leí `PENDIENTES-AL-CAMBIO-DE-PC-2026-06-18.md` (act. 19-jun). **§8 ampliado** con: 3ª indicación de Carolina
+  (**Fruty Green 45→33**, era el Portal del Cliente; fix `portal.js:497` `status:'RENTED'`), fórmula del split
+  (commit 77c46df), **decisión canon = Opción A** (confirmada), **autorización** de usar el admin del API,
+  y **2 tareas ya ejecutadas el 19-jun**: Fruty Green→33 y cierre de **410 contratos artefacto** (activos 601→191).
+- Registrada la identidad Azure correcta (**cloud@**, jdlopera@ sin RBAC) y respuesta enviada a Carolina por Chrome (19-jun).
+- Pendientes vivos de facturación: export Siigo pagadas, split_pendiente_carolina.csv, modelo OC + prefactura,
+  duplicados DUP-, Andrey, DataCrédito → encender auto-billing **antes del corte día 27**.
