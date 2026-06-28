@@ -466,3 +466,11 @@ reconcile-siigo.mjs · AZURE-APPSETTINGS-Y-QA-PLAN.md · README. Mover a `multit
   por ningún canal (ni el Chrome del PC, que no controlo desde aquí). **Para desarrollar rentingos → abrir sesión scopeada a ese repo.**
 - Agregado `code2-staging/main.bicep` (Infra-as-Code: App Service Node22 + Postgres Flexible PITR35/geo + Static Web App +
   App Insights + Key Vault + action group/alertas). Validar con `az bicep build`/`what-if` en el repo de producto.
+
+### 2026-06-27 (3) — PLAN-QA-RENTINGOS-US (P0-1) + arranque de sesión de producto
+- Escrito `code2-staging/PLAN-QA-RENTINGOS-US.md`: matriz **Q1–Q14** por módulo (pasos, criterio PASS, claim que habilita,
+  gate de keys) — el P0-1 que faltaba. Regla: un claim (IA/QuickBooks/ACH/tax/pagos) no se publica hasta que su Q esté PASS.
+  Q13 (motor facturación) = solo preview, NO encender. `HANDOFF-CODE2-BIG-ITEMS` ya espejado en §13.
+- Escrito `code2-staging/ARRANQUE-SESION-PRODUCTO.md`: primer mensaje + orden de ejecución (datos→infra→monitoreo→
+  Proyectos→QA→reconciliación→facturación) para la sesión scopeada a `multitechcloudlatam/rentingos`.
+- Modo autonomía: no hay toggle que yo active; opero sin preguntar y dejo todo en git. El acceso al repo de producto sigue 403 desde aquí.
