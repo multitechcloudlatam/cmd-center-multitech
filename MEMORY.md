@@ -42,9 +42,9 @@
    (Application Insights + availability test sobre `/health` + alertas). Mismo runbook.
 4. **Re-verificar en la sub nueva** lo que se hizo el 19-jun en la vieja (Fruty Green→33, cierre de 410 contratos,
    conteo 96 facturas). Checklist: `runbooks/CHECKLIST-REVERIFICACION-SUB-NUEVA.md`.
-5. **Facturación junio (corte día 27):** decisión canon = **Opción A** (confirmada) → ajustar `billing_split.js`;
-   construir modelo **OC + prefactura** (Interaseo/Eléctricas); pedir a Carolina export Siigo de pagadas + Costo/CLOUD
-   faltantes; luego **encender auto-billing**.
+5. **Facturación junio (corte día 27):** canon = **Opción A**; modelo **OC + prefactura**. 🚨 **NO encender
+   auto-billing** hasta **reconciliar Siigo↔RentingOS** (motor en MODO PRUEBA; Carolina en incapacidad desde 25-jun;
+   empresa en Ley 1116). Script de reconciliación listo en `code2-staging/reconcile-siigo.mjs`. Ver §13.
 6. **Bugs producto (§11):** i18n EN/ES (bloquea US), emitir lote 2.750 facturas DRAFT (decisión fiscal Carolina),
    re-sync drift `ai.js`. Terminar/mergear PR #1 módulo **Proyectos**.
 7. **Marketing:** Chrome visible → programar carruseles; logo LinkedIn; créditos Kling; cuenta Google Ads US (bono vence 12-jul).
@@ -359,6 +359,33 @@ Secrets: Azure App Settings (fuente de verdad) + respaldo local `DEPLOY-SECRETS.
 
 ---
 
+## 13. HANDOFF-CODE2-BIG-ITEMS (2026-06-27) — 3 temas grandes para Code2
+
+> Fuente: `RentingOS/HANDOFF-CODE2-BIG-ITEMS-2026-06-27.md` (emitido por la sesión Estrategia/Marketing).
+> Regla: lo codificable hoy en el repo → ejecutar; lo que dependa de Azure/keys/cuentas → preparar + Jhovan hace KYC/2FA.
+
+1. **Módulo PROYECTOS** (prioridad #1 ejecutable; "ServiceNow-lite + PSA"). Spec build-ready en
+   `US-MARKET-DEV-ROADMAP-2026-06-26.md §D` (tablas `projects/milestones/tasks/time_entries/project_assets`,
+   rutas `/api/projects` con CRUD+summary+milestone→invoice+time→invoice+`/ai/plan`, `proyectos.html` EN/ES,
+   reusar rail de cobro Stripe/Avalara/QBO). **Ya construido en PR #1 `feat/projects-module`** → falta QA en vivo,
+   portar tablas a `schema.prisma`, reemplazar `prompt()` por formularios, merge. (Requiere el repo de producto.)
+2. **Azure vivo + keys + QA.** Jhovan: KYC/2FA de Stripe live, QuickBooks (Intuit), Plaid prod, Avalara; términos
+   del crédito $5.000. Code2 deja listo: lista de App Settings + plan QA en vivo + **backup automático de DB**
+   (GRAVE: nunca hubo; dump más reciente `rentingos_db_2026-04-27.dump` ~2 meses). → `code2-staging/AZURE-APPSETTINGS-Y-QA-PLAN.md`.
+3. **Reconciliar Siigo↔RentingOS** (bloqueado hasta app/DB viva). Excel maestro `RENTING - MAYO 2026.xlsx`
+   (71 hojas; mejor copia = correo Carolina 1-jun 20:57). Mayo bruto ≈ $167.072.910 (64/64 NIT). Códigos canon:
+   AED (c/IVA), AEE (excluido), CLOUD `cloudex330` $42.288,98/equipo; retención = ValorMensualIPC×4%; sin IPC =
+   Fácil Crédito/Eléctricas/Interaseo; Interaseo+Eléctricas facturan por OC. Script listo: `code2-staging/reconcile-siigo.mjs` (READ-ONLY).
+
+**🚨 REGLA DE SEGURIDAD (no negociable):** el **motor de facturación SIGUE EN MODO PRUEBA** — NO encender hasta
+reconciliar pagos Siigo↔RentingOS (no cobrar de más a quien ya pagó). **Carolina en incapacidad desde 25-jun**;
+empresa en **Reorganización Abreviada (Ley 1116)**. Esto modula §8 (no encender auto-billing aunque el corte sea el 27).
+
+**Entregables montados en `code2-staging/`** (esta sesión no puede pushear al repo de producto, 403):
+reconcile-siigo.mjs · AZURE-APPSETTINGS-Y-QA-PLAN.md · README. Mover a `multitechcloudlatam/rentingos` (en rama) y ejecutar con acceso.
+
+---
+
 ## 7. Bitácora de sesiones web (git)
 
 ### 2026-06-14 — Sesión web "Code2" (este contenedor)
@@ -423,3 +450,12 @@ Secrets: Azure App Settings (fuente de verdad) + respaldo local `DEPLOY-SECRETS.
   ⚠️ El clasificador de seguridad bloqueó que YO creara el hook auto-ejecutable + `.claude/settings.json`; quedan listos para que Jhovan los apruebe (1 vez).
 - **Respaldo integral:** `runbooks/BACKUP-Y-DR-INTEGRAL.md` — código (mirror+bundle), infra (ARM/Bicep export), claves (Key Vault + copia cifrada), BD (PITR ✅ + `pg_dump` off-Azure cifrado ❌ pendiente), monitoreo Azure 24/7. No ejecutable desde la web (sin acceso Azure/BD); listo para correr con `cloud@`.
 - **Re-verificación:** `runbooks/CHECKLIST-REVERIFICACION-SUB-NUEVA.md` (confirmar en la sub $5.000 lo hecho el 19-jun en la vieja).
+
+### 2026-06-27 — HANDOFF-CODE2-BIG-ITEMS + hook activo + staging
+- Jhovan autorizó **todas las sugerencias** y señaló `RentingOS/HANDOFF-CODE2-BIG-ITEMS-2026-06-27.md`. Leído e ingerido (§13).
+- **Hook de continuidad ACTIVO:** con la autorización explícita ya creé `.claude/hooks/session-start.sh` (chmod +x,
+  validado: vuelca MEMORY.md al iniciar) + `.claude/settings.json`. Al mergear a la rama por defecto, toda sesión arranca con memoria.
+- **Entregables montados en `code2-staging/`** (no puedo pushear al repo de producto, 403): `reconcile-siigo.mjs`
+  (READ-ONLY, `node --check` OK), `AZURE-APPSETTINGS-Y-QA-PLAN.md`, README. Listos para mover a `multitechcloudlatam/rentingos`.
+- **Regla de seguridad registrada:** motor de facturación en MODO PRUEBA; no encender hasta reconciliar Siigo; Carolina incapacitada; Ley 1116.
+- Ítem 1 (Proyectos) ya está en PR #1 → falta QA/merge en el repo. Ítem 2 keys/Azure = KYC de Jhovan. Ítem 3 script listo, corre con DB+SIIGO_ACCESS_KEY.
